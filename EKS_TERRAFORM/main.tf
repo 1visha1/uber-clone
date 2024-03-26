@@ -81,7 +81,7 @@ resource "aws_vpc_attachment" "internet_gateway_attachment" {
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+    values = [resource.aws_vpc.main.id]
   }
 }
 #cluster provision
@@ -90,7 +90,7 @@ resource "aws_eks_cluster" "example" {
   role_arn = aws_iam_role.example.arn
 
   vpc_config {
-    subnet_ids = data.aws_subnets.public.ids
+    subnet_ids = resource.aws_subnets.public_subnet.ids
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
