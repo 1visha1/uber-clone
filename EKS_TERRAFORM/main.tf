@@ -21,10 +21,62 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
   role       = aws_iam_role.example.name
 }
 
-#get vpc data
-data "aws_vpc" "default" {
-  default = true
+
+
+
+
+
+
+# Create VPC
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
 }
+
+# Create Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+}
+
+# Create Public Subnet
+resource "aws_subnet" "public_subnet" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"  # Adjust as needed
+  availability_zone = "us-east-1a"   # Adjust as needed
+
+  tags = {
+    Name = "Public Subnet"
+  }
+}
+
+# Create Private Subnet
+resource "aws_subnet" "private_subnet" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"  # Adjust as needed
+  availability_zone = "us-east-1a"   # Adjust as needed
+
+  tags = {
+    Name = "Private Subnet"
+  }
+}
+
+# Associate Internet Gateway with VPC
+resource "aws_vpc_attachment" "internet_gateway_attachment" {
+  vpc_id       = aws_vpc.main.id
+  internet_gateway_id = aws_internet_gateway.main.id
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 #get public subnets for cluster
 data "aws_subnets" "public" {
   filter {
